@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tính toán dinh dưỡng • Recipe Discovery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body { background: #f5f5f7; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+
+        /* ============================= NAVBAR – GIỐNG HỆT HOME ============================= */
+        .navbar-custom {
+            background: linear-gradient(90deg, #22c55e, #16a34a, #15803d);
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+        .navbar-brand {
+            letter-spacing: .7px;
+            font-size: 20px;
+            font-weight: 700;
+            color: white !important;
+        }
+        .nav-icon {
+            border-radius: 50%;
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            font-size: 18px;
+            transition: 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-icon:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+
+        /* ============================= SIDEBAR – GIỐNG HỆT HOME (không emoji) ============================= */
+        .sidebar-card {
+            background: linear-gradient(180deg, #f7e9dd 0%, #e7d5c9 100%);
+            border-radius: 18px;
+            box-shadow: 0 14px 35px rgba(0,0,0,0.15);
+            padding: 20px 15px;
+        }
+        .sidebar-title {
+            font-weight: 700;
+            color: #92400e;
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 17px;
+        }
+        .sidebar-item-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            border-radius: 12px;
+            padding: 10px 14px;
+            border: none;
+            background: transparent;
+            color: #4b301f;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.2s;
+            margin-bottom: 6px;
+        }
+        .sidebar-item-btn:hover {
+            background: rgba(255,255,255,0.8);
+            transform: translateX(3px);
+        }
+        .sidebar-item-btn.active {
+            background: #4caf50;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: 600;
+        }
+        .sidebar-item-btn .icon {
+            width: 28px; height: 28px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        /* ============================= MAIN CARD ============================= */
+        .calc-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            padding: 36px;
+        }
+        .title-main {
+            font-size: 28px;
+            font-weight: 800;
+            color: #15803d;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: #6b7280;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .form-control, .form-select {
+            border-radius: 14px;
+            padding: 12px 16px;
+            border: 1.5px solid #d1d5db;
+        }
+        .input-group-text {
+            background: #f0fdf4;
+            border: 1.5px solid #86efac;
+            color: #166534;
+            border-radius: 14px 0 0 14px;
+            font-weight: 600;
+        }
+        .btn-calculate {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            border: none;
+            border-radius: 16px;
+            padding: 14px 40px;
+            font-weight: 700;
+            font-size: 17px;
+            color: white;
+            box-shadow: 0 6px 20px rgba(34,197,94,0.35);
+        }
+        .result-box {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 20px;
+            padding: 28px;
+            margin-top: 30px;
+            border: 2px solid #86efac;
+        }
+        .macro-box {
+            padding: 20px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 18px;
+            text-align: center;
+        }
+        .macro-protein { background: #fffbeb; color: #92400e; }
+        .macro-carbs   { background: #dbeafe; color: #3730a3; }
+        .macro-fat     { background: #fce7f3; color: #be123c; }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR – DÙNG BOOTSTRAP ICONS, KHÔNG EMOJI -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+    <div class="container-fluid px-3">
+        <a class="navbar-brand" th:href="@{/app/home}">Recipe Discovery</a>
+
+        <div class="flex-grow-1 d-none d-md-flex justify-content-center">
+            <form class="d-flex align-items-center gap-2" th:action="@{/app/home}" method="get">
+                <input class="form-control rounded-pill" style="max-width:420px" type="search" name="q" placeholder="Tìm công thức..." th:value="${param.q}">
+                <button class="btn btn-light rounded-pill px-4" type="submit">Tìm</button>
+            </form>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <button class="nav-icon" title="Chế độ sáng/tối"><i class="bi bi-sun-fill"></i></button>
+            <button class="nav-icon" title="Thông báo"><i class="bi bi-bell-fill"></i></button>
+            <button class="nav-icon" title="Tin nhắn"><i class="bi bi-chat-dots-fill"></i></button>
+
+            <div class="dropdown">
+                <button class="nav-icon dropdown-toggle" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i></button>
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li class="dropdown-item-text px-3">
+                        <strong th:text="${session.USER.fullName}">User</strong><br>
+                        <small class="text-muted" th:text="${session.USER.email}"></small>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><form th:action="@{/logout}" method="post">
+                        <button class="dropdown-item text-danger" type="submit">Đăng xuất</button>
+                    </form></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row gx-4 mt-2">
+
+        <!-- SIDEBAR – DÙNG BOOTSTRAP ICONS, GIỐNG HỆT HOME -->
+        <div class="col-md-3 col-lg-2 mb-3">
+            <div class="sidebar-card">
+                <div class="sidebar-title">MỤC LỤC</div>
+
+                <button class="sidebar-item-btn" onclick="location.href='/app/home'">
+                    <span class="icon"><i class="bi bi-house-door-fill"></i></span>
+                    <span class="label">Công thức cá nhân</span>
+                </button>
+
+                <button class="sidebar-item-btn" onclick="location.href='/app/community'">
+                    <span class="icon"><i class="bi bi-people-fill"></i></span>
+                    <span class="label">Công thức cộng đồng</span>
+                </button>
+
+                <button class="sidebar-item-btn">
+                    <span class="icon"><i class="bi bi-calendar3"></i></span>
+                    <span class="label">Kế hoạch bữa ăn</span>
+                </button>
+
+                <button class="sidebar-item-btn" onclick="location.href='/app/categories'">
+                    <span class="icon"><i class="bi bi-rocket-takeoff-fill"></i></span>
+                    <span class="label">Chế độ ăn của tôi</span>
+                </button>
+
+                <button class="sidebar-item-btn active">
+                    <span class="icon"><i class="bi bi-calculator-fill"></i></span>
+                    <span class="label">Tính toán dinh dưỡng</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="col-md-9 col-lg-10">
+            <div class="calc-card mx-auto">
+                <h1 class="title-main">Tính toán nhu cầu dinh dưỡng</h1>
+                <p class="subtitle">Nhập thông tin để biết chính xác bạn cần bao nhiêu calo mỗi ngày</p>
+
+                <div class="row g-5">
+                    <div class="col-lg-5">
+                        <h5 class="mb-4 text-success fw-bold">Thông tin cá nhân</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Chiều cao (cm)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="height" placeholder="170" required>
+                                <span class="input-group-text">cm</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Cân nặng (kg)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="weight" placeholder="65" required>
+                                <span class="input-group-text">kg</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tuổi</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="age" placeholder="25" required>
+                                <span class="input-group-text">tuổi</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Giới tính</label>
+                            <select class="form-select" id="gender">
+                                <option value="male">Nam</option>
+                                <option value="female" selected>Nữ</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Mức độ vận động</label>
+                            <select class="form-select" id="activity">
+                                <option value="1.2">Ít vận động</option>
+                                <option value="1.375">Nhẹ</option>
+                                <option value="1.55" selected>Trung bình</option>
+                                <option value="1.725">Nặng</option>
+                                <option value="1.9">Rất nặng</option>
+                            </select>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="button" class="btn btn-calculate" onclick="calculate()">
+                                Tính toán ngay
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <h5 class="mb-4 text-success fw-bold">Kết quả của bạn</h5>
+
+                        <div id="resultSection" class="result-box d-none">
+                            <div class="text-center mb-4">
+                                <h3 class="mb-1">Nhu cầu calo hàng ngày</h3>
+                                <h2 id="dailyCalo" class="text-success fw-bold">0</h2>
+                                <p class="text-muted small">±15% (khoảng phù hợp cho gợi ý)</p>
+                            </div>
+
+                            <div class="row text-center g-3 mb-5">
+                                <div class="col-md-4">
+                                    <div class="macro-box macro-protein">
+                                        Protein<br>
+                                        <span id="protein" class="fs-2 fw-bold">0</span> g
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="macro-box macro-carbs">
+                                        Carbs<br>
+                                        <span id="carbs" class="fs-2 fw-bold">0</span> g
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="macro-box macro-fat">
+                                        Fat<br>
+                                        <span id="fat" class="fs-2 fw-bold">0</span> g
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- NÚT GỢI Ý MỚI – ĐẸP NHƯ CÁC TRANG KHÁC -->
+                            <div class="text-center mb-4">
+                                <button type="button" class="btn btn-success btn-lg rounded-pill px-5 shadow-lg"
+                                        onclick="suggestRecipes()">
+                                    Gợi ý công thức phù hợp
+                                </button>
+                            </div>
+
+                            <!-- KHU VỰC HIỂN THỊ KẾT QUẢ GỢI Ý -->
+                            <div id="suggestionResult" class="mt-5 d-none">
+                                <h4 class="text-center fw-bold text-success mb-4">
+                                    Đề xuất <span id="suggestionCount">0</span> công thức phù hợp
+                                </h4>
+                                <div id="suggestionList" class="row g-4"></div>
+
+                                <div id="noSuggestion" class="text-center py-5 text-muted d-none">
+                                    <i class="bi bi-emoji-neutral fs-1"></i>
+                                    <p class="mt-3 fw-semibold">Chưa có công thức nào phù hợp</p>
+                                    <small>Thử tạo thêm công thức hoặc xem cộng đồng nhé!</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4 text-muted">
+                            <small>Công thức Harris-Benedict • Mang tính tham khảo</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- THÊM SCRIPT MỚI (thay thế hàm calculate() cũ) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let userCalo = 0;
+    let currentPage = 0;
+    let hasMorePages = true;
+    let isLoading = false;
+
+    function calculate() {
+        const h = parseFloat(document.getElementById('height').value) || 0;
+        const w = parseFloat(document.getElementById('weight').value) || 0;
+        const a = parseFloat(document.getElementById('age').value) || 0;
+        const g = document.getElementById('gender').value;
+        const act = parseFloat(document.getElementById('activity').value) || 1.55;
+
+        if (!h || !w || !a) {
+            alert('Vui lòng nhập đầy đủ thông tin!');
+            return;
+        }
+
+        const bmr = g === 'male'
+            ? 88.362 + (13.397 * w) + (4.799 * h) - (5.677 * a)
+            : 447.593 + (9.247 * w) + (3.098 * h) - (4.330 * a);
+
+        userCalo = Math.round(bmr * act);
+
+        document.getElementById('dailyCalo').innerText = userCalo.toLocaleString('vi-VN');
+        document.getElementById('protein').innerText = Math.round((userCalo * 0.30) / 4);
+        document.getElementById('carbs').innerText   = Math.round((userCalo * 0.40) / 4);
+        document.getElementById('fat').innerText     = Math.round((userCalo * 0.30) / 9);
+
+        document.getElementById('resultSection').classList.remove('d-none');
+        document.getElementById('suggestionResult')?.classList.add('d-none');
+
+        // Reset gợi ý khi tính lại
+        currentPage = 0;
+        hasMorePages = true;
+        document.getElementById('suggestionList').innerHTML = '';
+        document.getElementById('loadMoreContainer')?.remove();
+    }
+
+    function suggestRecipes() {
+        if (isLoading || !hasMorePages) return;
+        isLoading = true;
+
+        const list = document.getElementById('suggestionList');
+        const container = document.getElementById('loadMoreContainer');
+
+        // Hiển thị loading lần đầu
+        if (currentPage === 0) {
+            list.innerHTML = `<div class="col-12 text-center py-5"><div class="spinner-border text-success" role="status"><span class="visually-hidden">Đang tìm công thức...</span></div></div>`;
+            document.getElementById('suggestionResult').classList.remove('d-none');
+        }
+
+        fetch(`/app/api/recipes/suggest?calo=${userCalo}&page=${currentPage}&size=12`)
+            .then(res => {
+                if (!res.ok) throw new Error('Network error');
+                return res.json();
+            })
+            .then(data => {
+                // Cập nhật tổng số món (chỉ lần đầu)
+                if (currentPage === 0) {
+                    document.getElementById('suggestionCount').textContent = data.total || 0;
+                }
+
+                hasMorePages = data.hasMore;
+
+                // Thêm các món mới
+                const html = data.recipes.map(r => `
+                    <div class="col-6 col-md-4 col-lg-3 mb-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden"
+                             style="cursor:pointer; transition:transform .3s; box-shadow:0 4px 15px rgba(0,0,0,0.1);"
+                             onmouseover="this.style.transform='translateY(-8px)'"
+                             onmouseout="this.style.transform='translateY(0)'"
+                             onclick="window.location.href='/app/recipes/${r.id}'">
+                            <div class="position-relative">
+                                <img src="${r.imageUrl || 'https://via.placeholder.com/400x260/22c55e/white?text=No+Image'}"
+                                     class="card-img-top" alt="${r.title}" style="height:180px; object-fit:cover;">
+                                <span class="position-absolute top-0 end-0 m-2 badge rounded-pill text-white fw-bold"
+                                      style="background:${r.userCategory?.colorCode || '#4caf50'}; font-size:11px;">
+                                    ${r.userCategory?.icon || ''} ${r.userCategory?.name || 'Khác'}
+                                </span>
+                            </div>
+                            <div class="card-body p-3">
+                                <h6 class="card-title mb-2 fw-bold text-dark" style="font-size:15px; line-height:1.3;">
+                                    ${r.title}
+                                </h6>
+                                <div class="d-flex justify-content-between small text-muted">
+                                    <span><i class="bi bi-fire"></i> ${r.calories || 0} calo</span>
+                                    <span><i class="bi bi-clock"></i> ${r.cookingTime || 0} phút</span>
+                                </div>
+                                <div class="text-success small fw-bold mt-2">
+                                    Dưới ${userCalo - (r.calories || 0)} calo so với nhu cầu
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                if (currentPage === 0) {
+                    list.innerHTML = html;
+                } else {
+                    list.innerHTML += html;
+                }
+
+                // Xử lý nút "Xem thêm"
+                if (container) container.remove();
+
+                if (hasMorePages) {
+                    list.insertAdjacentHTML('afterend', `
+                        <div id="loadMoreContainer" class="col-12 text-center my-5">
+                            <button class="btn btn-outline-success btn-lg rounded-pill px-5 shadow-sm"
+                                    onclick="suggestRecipes()">
+                                <i class="bi bi-arrow-down-circle"></i> Xem thêm công thức
+                            </button>
+                        </div>
+                    `);
+                } else if (data.total > 0) {
+                    list.insertAdjacentHTML('afterend', `
+                        <div class="col-12 text-center text-muted my-4">
+                            <small>Đã hiển thị hết ${data.total} công thức phù hợp</small>
+                        </div>
+                    `);
+                }
+
+                if (data.recipes.length === 0 && currentPage === 0) {
+                    list.innerHTML = '';
+                    document.getElementById('noSuggestion').classList.remove('d-none');
+                } else {
+                    document.getElementById('noSuggestion').classList.add('d-none');
+                }
+
+                currentPage++;
+                isLoading = false;
+            })
+            .catch(err => {
+                console.error(err);
+                list.innerHTML += `<div class="col-12 text-center text-danger py-4">
+                    <i class="bi bi-wifi-off fs-1"></i>
+                    <p class="mt-3">Không thể tải gợi ý. Vui lòng thử lại!</p>
+                </div>`;
+                isLoading = false;
+            });
+    }
+</script>
+</body>
+</html>
