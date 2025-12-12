@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kế hoạch bữa ăn • Recipe Discovery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            background: #f5f5f7;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ==================== NAVBAR ==================== */
+        .navbar-custom {
+            background: linear-gradient(90deg, #22c55e, #16a34a, #15803d);
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            backdrop-filter: blur(8px);
+        }
+        .navbar-brand {
+            letter-spacing: .7px;
+            font-size: 20px;
+            font-weight: 700;
+            color: white !important;
+        }
+        .nav-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            font-size: 18px;
+            transition: 0.25s;
+        }
+        .nav-icon:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+
+        /* ==================== SIDEBAR ==================== */
+        .sidebar-card {
+            background: linear-gradient(180deg, #f7e9dd 0%, #e7d5c9 100%);
+            border-radius: 18px;
+            box-shadow: 0 14px 35px rgba(0,0,0,0.15);
+            padding: 20px 15px;
+        }
+        .sidebar-title {
+            font-weight: 700;
+            color: #92400e;
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 17px;
+        }
+        .sidebar-item-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            border-radius: 12px;
+            padding: 10px 14px;
+            border: none;
+            background: transparent;
+            color: #4b301f;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.2s;
+            margin-bottom: 6px;
+        }
+        .sidebar-item-btn:hover {
+            background: rgba(255,255,255,0.8);
+            transform: translateX(3px);
+        }
+        .sidebar-item-btn.active {
+            background: #4caf50;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: 600;
+        }
+        .sidebar-item-btn .icon {
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        /* ==================== TRANG TRÍ LỊCH BỮA ĂN ĐẸP HƠN ==================== */
+        .meal-time-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .meal-time-card:hover {
+            transform: translateY(-8px);
+        }
+        .meal-time-card h5 {
+            font-weight: 700;
+            color: #15803d;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+        .meal-time-card .time {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        /* Thẻ món nhỏ gọn + đẹp */
+        .meal-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #f0fdf4, #e6f4ea);
+            border-radius: 16px;
+            padding: 10px 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid #a7f3d0;
+        }
+        .meal-badge:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+            border-color: #4caf50;
+        }
+        .meal-badge img {
+            width: 54px;
+            height: 54px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid white;
+        }
+        .meal-badge .title {
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.4;
+            flex: 1;
+            text-align: left;
+        }
+        .meal-badge .btn-sm {
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+
+        /* Màu nền nhẹ cho từng ngày */
+        .day-row {
+            transition: background 0.3s;
+        }
+        .day-row:hover {
+            background: #f0fdf4;
+        }
+
+        .day-col {
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .day-col.monday { background: #e0f2fe; }
+        .day-col.tuesday { background: #fef3c7; }
+        .day-col.wednesday { background: #e0f7fa; }
+        .day-col.thursday { background: #f3e8ff; }
+        .day-col.friday { background: #ecfdf5; }
+        .day-col.saturday { background: #fef3f8; }
+        .day-col.sunday { background: #f0fdf4; }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR – Y CHANG TRANG HOME -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom position-relative">
+    <div class="container-fluid px-3">
+        <a class="navbar-brand" th:href="@{/app/home}">Recipe Discovery</a>
+
+        <div class="d-flex align-items-center gap-2">
+            <button class="nav-icon" title="Chế độ sáng/tối"><i class="bi bi-sun-fill"></i></button>
+            <button class="nav-icon" title="Thông báo"><i class="bi bi-bell-fill"></i></button>
+            <button class="nav-icon" title="Tin nhắn"><i class="bi bi-chat-dots-fill"></i></button>
+
+            <div class="dropdown">
+                <button class="nav-icon dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li class="dropdown-item-text px-3">
+                        <strong th:text="${session.USER.fullName}">User</strong><br>
+                        <small class="text-muted" th:text="${session.USER.email}"></small>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form th:action="@{/logout}" method="post">
+                            <button class="dropdown-item text-danger" type="submit">Đăng xuất</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row gx-4 mt-2">
+
+        <!-- SIDEBAR – Y CHANG TRANG HOME -->
+        <div class="col-md-3 col-lg-2 mb-3">
+            <div class="sidebar-card">
+                <div class="sidebar-title">MỤC LỤC</div>
+
+                <button class="sidebar-item-btn" onclick="location.href='/app/home'">
+                    <span class="icon"><i class="bi bi-house-door-fill"></i></span>
+                    <span class="label">Công thức cá nhân</span>
+                </button>
+
+                <button class="sidebar-item-btn" onclick="location.href='/app/community'">
+                    <span class="icon"><i class="bi bi-people-fill"></i></span>
+                    <span class="label">Công thức cộng đồng</span>
+                </button>
+
+                <button class="sidebar-item-btn active" onclick="location.href='/app/meal-plan'">
+                    <span class="icon"><i class="bi bi-calendar3"></i></span>
+                    <span class="label">Kế hoạch bữa ăn</span>
+                </button>
+
+                <button class="sidebar-item-btn" onclick="location.href='/app/categories'">
+                    <span class="icon"><i class="bi bi-rocket-takeoff-fill"></i></span>
+                    <span class="label">Chế độ ăn của tôi</span>
+                </button>
+
+                <button class="sidebar-item-btn" onclick="location.href='/app/nutrition-calculator'">
+                    <span class="icon"><i class="bi bi-calculator-fill"></i></span>
+                    <span class="label">Tính toán dinh dưỡng</span>
+                </button>
+
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-2 border-top border-warning-subtle">
+                    <small class="text-muted">Tổng công thức:</small>
+                    <span class="badge bg-success fs-6" th:text="${#lists.size(recipes)}">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NỘI DUNG CHÍNH – LỊCH ĐẸP LUNG LINH -->
+        <div class="col-md-9 col-lg-10">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0 text-success">Kế hoạch bữa ăn</h4>
+                <span class="text-muted">Lên lịch trình bữa ăn cho tuần của bạn</span>
+            </div>
+
+            <!-- Thời gian các bữa – thêm icon đẹp -->
+            <div class="row g-3 mb-5">
+                <div class="col-md-3">
+                    <div class="meal-time-card">
+                        <h5><i class="bi bi-sunrise"></i> Bữa sáng</h5>
+                        <div class="time">07:00 – 09:00</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="meal-time-card">
+                        <h5><i class="bi bi-sun"></i> Bữa trưa</h5>
+                        <div class="time">11:00 – 13:00</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="meal-time-card">
+                        <h5><i class="bi bi-cloud-sun"></i> Bữa chiều</h5>
+                        <div class="time">15:00 – 17:00</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="meal-time-card">
+                        <h5><i class="bi bi-moon"></i> Bữa tối</h5>
+                        <div class="time">17:00 – 21:00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lịch tuần – siêu đẹp -->
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold text-success mb-4">Tuần này</h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-borderless text-center align-middle">
+                            <thead class="bg-light">
+                            <tr>
+                                <th style="width: 100px;">Ngày</th>
+                                <th>Bữa sáng</th>
+                                <th>Bữa trưa</th>
+                                <th>Bữa chiều</th>
+                                <th>Bữa tối</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="day, iter : ${days}" class="day-row">
+                                <td class="day-col"
+                                    th:classappend="${iter.index == 0 ? 'monday' : iter.index == 1 ? 'tuesday' : iter.index == 2 ? 'wednesday' : iter.index == 3 ? 'thursday' : iter.index == 4 ? 'friday' : iter.index == 5 ? 'saturday' : 'sunday'}"
+                                    th:text="${day}"></td>
+
+                                <td th:each="meal : ${mealTypes}">
+                                    <!-- Món đã chọn – thẻ nhỏ đẹp -->
+                                    <div th:if="${planMap[iter.index+1][meal.key]}" class="meal-badge"
+                                         th:onclick="'window.location.href=\'/app/recipes/' + ${planMap[iter.index+1][meal.key].id} + '\''">
+                                        <img th:src="${planMap[iter.index+1][meal.key].imageUrl} ?: 'https://via.placeholder.com/54'"
+                                             alt="Món">
+                                        <div class="title" th:text="${planMap[iter.index+1][meal.key].title}"></div>
+                                        <form th:action="@{/app/meal-plan/remove}" method="post" style="display:inline;"
+                                              th:onclick="event.stopPropagation()">
+                                            <input type="hidden" name="planId" th:value="${plan.id}"/>
+                                            <input type="hidden" name="dayOfWeek" th:value="${iter.index+1}"/>
+                                            <input type="hidden" name="mealType" th:value="${meal.key}"/>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Chưa chọn -->
+                                    <div th:unless="${planMap[iter.index+1][meal.key]}">
+                                        <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3 py-2"
+                                                data-bs-toggle="modal" data-bs-target="#selectRecipeModal"
+                                                th:attr="data-day=${iter.index+1}, data-meal=${meal.key}">
+                                            <i class="bi bi-plus-lg"></i> Thêm
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <button class="btn btn-success rounded-pill px-5 py-2 shadow-sm">
+                            <i class="bi bi-save"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal chọn món -->
+<div class="modal fade" id="selectRecipeModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content rounded-4 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold text-success">Chọn món ăn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4">
+                    <div th:each="recipe : ${recipes}" class="col-md-4 col-lg-3">
+                        <div class="card h-100 shadow-sm rounded-4 border-0">
+                            <img th:src="${recipe.imageUrl} ?: 'https://via.placeholder.com/300x200'"
+                                 class="card-img-top rounded-top" style="height:160px; object-fit: cover;">
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title fw-bold" th:text="${recipe.title}"></h6>
+                                <div class="mt-auto">
+                                    <form th:action="@{/app/meal-plan/update}" method="post">
+                                        <input type="hidden" name="planId" th:value="${plan.id}"/>
+                                        <input type="hidden" name="dayOfWeek" id="modalDay"/>
+                                        <input type="hidden" name="mealType" id="modalMeal"/>
+                                        <input type="hidden" name="recipeId" th:value="${recipe.id}"/>
+                                        <button type="submit" class="btn btn-success w-100 rounded-pill">
+                                            Chọn món này
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script fix lỗi chọn món ở mọi ô -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const selectModal = document.getElementById('selectRecipeModal');
+    selectModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const day = button.getAttribute('data-day');
+        const meal = button.getAttribute('data-meal');
+
+        document.querySelectorAll('form[action="/app/meal-plan/update"] input[name="dayOfWeek"]').forEach(el => el.value = day);
+        document.querySelectorAll('form[action="/app/meal-plan/update"] input[name="mealType"]').forEach(el => el.value = meal);
+    });
+</script>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

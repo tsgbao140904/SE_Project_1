@@ -302,7 +302,8 @@
                     </div>
                 </div>
 
-                <!-- PHÂN TRANG -->
+
+                <!-- PHÂN TRANG – ĐÃ SỬA ĐỂ GIỮ THAM SỐ q -->
                 <div class="text-center mt-5" th:if="${totalPages > 1}">
                     <nav>
                         <ul class="pagination justify-content-center">
@@ -328,7 +329,7 @@
         </div>
     </div>
 </div>
-
+<div th:replace="~{fragments/footer :: footer}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -43,6 +43,15 @@ public class RecipeService {
         return recipeRepo.searchUserRecipes(userId, categoryId, kwLike);
     }
 
+    public List<Recipe> searchCommunityRecipes(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return recipeRepo.findByShareStatusAndIsPublic("APPROVED", 1);
+        }
+
+        String kw = "%" + keyword.trim().toLowerCase() + "%";
+        return recipeRepo.searchCommunityRecipes(kw);
+    }
+
     public Recipe getById(Long id) {
         return recipeRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy công thức"));
