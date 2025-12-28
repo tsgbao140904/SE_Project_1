@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhắc nhở bữa ăn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            margin: 0 0 5px 0;
+            font-size: 24px;
+        }
+
+        .meal-section {
+            background: #ecfdf5;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 3px solid #10b981;
+        }
+
+        .meal-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .meal-type {
+            font-size: 22px;
+            font-weight: bold;
+            color: #065f46;
+            margin: 10px 0;
+        }
+
+        .meal-time {
+            color: #047857;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .greeting {
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .recipe-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .recipe-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+
+        .meta-row {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            display: table-cell;
+            text-align: center;
+            padding: 15px 10px;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .meta-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            color: #78716c;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .meta-value {
+            font-weight: bold;
+            color: #92400e;
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            color: #065f46;
+            margin: 20px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #10b981;
+        }
+
+        .text-content {
+            color: #4b5563;
+            line-height: 1.8;
+            white-space: pre-line;
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            padding: 14px 35px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .footer {
+            background: #f9fafb;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .footer a {
+            color: #10b981;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍴 Recipe Discovery</h1>
+            <p>Nhắc nhở thực đơn hôm nay</p>
+        </div>
+
+        <div class="meal-section">
+            <div class="meal-icon" th:text="${mealIcon}">🍳</div>
+            <div class="meal-type"
+                th:text="${mealType == 'BREAKFAST' ? 'BỮA SÁNG' : mealType == 'LUNCH' ? 'BỮA TRƯA' : mealType == 'SNACK' ? 'BỮA PHỤ' : 'BỮA TỐI'}">
+                BỮA SÁNG</div>
+            <div class="meal-time" th:text="${mealTime}">07:00 - 09:00</div>
+        </div>
+
+        <div class="content">
+            <p class="greeting">Xin chào <strong th:text="${userName}" style="color:#10b981;">User</strong>! 👋</p>
+            <p class="greeting">Đã đến giờ cho bữa ăn của bạn. Đây là món ăn trong thực đơn:</p>
+
+            <div class="recipe-box">
+                <div class="recipe-title" th:text="${recipe.title}">Tên món ăn</div>
+
+                <div class="meta-row">
+                    <div class="meta-item">
+                        <span class="meta-icon">🔥</span>
+                        <span class="meta-label">Calories</span>
+                        <span class="meta-value" th:text="${recipe.calories}">0</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">⏰</span>
+                        <span class="meta-label">Thời gian</span>
+                        <span class="meta-value" th:text="${recipe.cookingTime} + '′'">0′</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">👥</span>
+                        <span class="meta-label">Khẩu phần</span>
+                        <span class="meta-value" th:text="${recipe.servings}">1</span>
+                    </div>
+                </div>
+
+                <div class="section-title">📝 Nguyên liệu</div>
+                <div class="text-content" th:text="${recipe.ingredients}">Nguyên liệu...</div>
+
+                <div class="section-title">👨‍🍳 Hướng dẫn</div>
+                <div class="text-content" th:text="${recipe.instructions}">Hướng dẫn...</div>
+            </div>
+
+            <center>
+                <a th:href="${baseUrl + '/app/meal-plan'}" class="btn">📅 Xem Kế Hoạch Bữa Ăn</a>
+            </center>
+        </div>
+
+        <div class="footer">
+            <p><strong style="color:#10b981;">Recipe Discovery</strong></p>
+            <p><a th:href="${baseUrl}">Trang chủ</a> • <a th:href="${baseUrl + '/app/meal-plan'}">Quản lý lịch</a></p>
+            <p style="margin-top:10px;font-size:12px;color:#9ca3af;">© 2025 Recipe Discovery</p>
+        </div>
+    </div>
+</body>
+
+</html>
