@@ -2,7 +2,7 @@
 
 **Phiên bản:** 1.0  
 **Ngày:** 29/12/2025  
-**Người thực hiện:** Development Team
+**Người thực hiện:** Thái Sinh Gia Bảo
 
 ---
 
@@ -986,5 +986,5 @@ Recipe Discovery là một hệ thống quản lý công thức nấu ăn toàn 
 
 ---
 
-**Tài liệu này được tạo tự động bởi Thái Sinh Gia Bảo**  
+**Tài liệu này được tạo bởi Thái Sinh Gia Bảo**  
 Phiên bản: 1.0 | Ngày: 29/12/2025
