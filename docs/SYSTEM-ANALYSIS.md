@@ -986,5 +986,5 @@ Recipe Discovery là một hệ thống quản lý công thức nấu ăn toàn 
 
 ---
 
-**Tài liệu này được tạo tự động bởi Antigravity AI**  
+**Tài liệu này được tạo tự động bởi Thái Sinh Gia Bảo**  
 Phiên bản: 1.0 | Ngày: 29/12/2025
