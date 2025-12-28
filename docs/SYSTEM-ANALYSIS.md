@@ -163,14 +163,14 @@ DTOs:
 
 ```mermaid
 graph TD
-    A[User click "Tạo công thức"] --> B[Điền form]
+    A[User click Tạo công thức] --> B[Điền form]
     B --> C[Upload ảnh optional]
     C --> D[Chọn category]
     D --> E[Submit form]
     E --> F{Validate}
     F -->|Valid| G[Save to DB]
     F -->|Invalid| B
-    G --> H[Upload ảnh to /uploads/]
+    G --> H[Upload ảnh to uploads folder]
     H --> I[Redirect to detail page]
 ```
 
@@ -207,7 +207,7 @@ Models:
 
 ```mermaid
 graph LR
-    A[Recipe Detail] --> B[Click "Chia sẻ"]
+    A[Recipe Detail] --> B[Click Chia sẻ button]
     B --> C[Confirm dialog]
     C --> D[Set isPublic = true]
     D --> E[Recipe xuất hiện trong Community]
@@ -275,9 +275,9 @@ sequenceDiagram
     participant S as MealPlanService
     participant DB as Database
 
-    U->>C: Click "Thêm món" cho Thứ 2/Sáng
+    U->>C: Click Thêm món cho Thứ 2 Sáng
     C->>S: getMealPlanForCurrentWeek(userId)
-    S->>DB: SELECT * FROM meal_plans WHERE user_id=? AND week_start_date=?
+    S->>DB: SELECT from meal_plans WHERE user_id and week_start_date
     alt Meal Plan exists
         DB-->>S: Return MealPlan
     else No Meal Plan
